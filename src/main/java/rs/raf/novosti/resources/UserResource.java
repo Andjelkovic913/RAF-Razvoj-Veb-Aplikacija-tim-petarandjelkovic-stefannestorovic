@@ -1,6 +1,7 @@
 package rs.raf.novosti.resources;
 
 import rs.raf.novosti.entities.User;
+import rs.raf.novosti.requests.LoginRequest;
 import rs.raf.novosti.services.UserService;
 
 import javax.inject.Inject;
@@ -17,6 +18,23 @@ public class UserResource {
 
     @Inject
     private UserService userService;
+
+    @POST
+    @Path("/login")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response login(@Valid LoginRequest loginRequest) {
+        Map<String, String> response = new HashMap<>();
+
+        String jwt = this.userService.login(loginRequest.getEmail(), loginRequest.getPassword());
+        if (jwt == null) {
+            response.put("error", "Pogresan email ili lozinka, ili je nalog deaktiviran");
+            return Response.status(Response.Status.UNAUTHORIZED).entity(response).build();
+        }
+
+        response.put("jwt", jwt);
+        return Response.ok(response).build();
+    }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
