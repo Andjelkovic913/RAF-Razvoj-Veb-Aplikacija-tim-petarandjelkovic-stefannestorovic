@@ -62,7 +62,6 @@ public class NewsService {
 
         this.newsRepository.update(news);
 
-        // zameni tagove
         this.tagRepository.removeTagsFromNews(id);
         if (tagValues != null) {
             for (String tagValue : tagValues) {
@@ -79,5 +78,65 @@ public class NewsService {
 
     public void deleteNews(Long id) {
         this.newsRepository.delete(id);
+    }
+
+    public List<News> searchNews(String query, int page, int pageSize) {
+        List<News> list = this.newsRepository.search(query, page, pageSize);
+        for (News news : list) {
+            news.setTags(this.tagRepository.findByNewsId(news.getId()));
+        }
+        return list;
+    }
+
+    public int searchCount(String query) {
+        return this.newsRepository.countSearch(query);
+    }
+
+    public List<News> mostReadNews(int limit, int days) {
+        List<News> list = this.newsRepository.findMostRead(limit, days);
+        for (News news : list) {
+            news.setTags(this.tagRepository.findByNewsId(news.getId()));
+        }
+        return list;
+    }
+
+    public List<News> topByReactions(int limit) {
+        List<News> list = this.newsRepository.findTopByReactions(limit);
+        for (News news : list) {
+            news.setTags(this.tagRepository.findByNewsId(news.getId()));
+        }
+        return list;
+    }
+
+    public List<News> relatedNews(Long newsId, int limit) {
+        List<News> list = this.newsRepository.findRelatedByTags(newsId, limit);
+        for (News news : list) {
+            news.setTags(this.tagRepository.findByNewsId(news.getId()));
+        }
+        return list;
+    }
+
+    public List<News> newsByTag(String tagValue, int page, int pageSize) {
+        List<News> list = this.newsRepository.findByTag(tagValue, page, pageSize);
+        for (News news : list) {
+            news.setTags(this.tagRepository.findByNewsId(news.getId()));
+        }
+        return list;
+    }
+
+    public int newsByTagCount(String tagValue) {
+        return this.newsRepository.countByTag(tagValue);
+    }
+
+    public List<News> newsByCategory(Long categoryId, int page, int pageSize) {
+        List<News> list = this.newsRepository.findByCategory(categoryId, page, pageSize);
+        for (News news : list) {
+            news.setTags(this.tagRepository.findByNewsId(news.getId()));
+        }
+        return list;
+    }
+
+    public int newsByCategoryCount(Long categoryId) {
+        return this.newsRepository.countByCategory(categoryId);
     }
 }
