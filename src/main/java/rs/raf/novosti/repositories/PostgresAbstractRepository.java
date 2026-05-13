@@ -42,7 +42,7 @@ abstract public class PostgresAbstractRepository {
     }
 
     protected String getPassword() {
-        return "";
+        return "12345678";
     }
 
     protected void closeStatement(Statement statement) {
