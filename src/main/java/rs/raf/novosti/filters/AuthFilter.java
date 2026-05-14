@@ -41,12 +41,31 @@ public class AuthFilter implements ContainerRequestFilter {
 
     private boolean isAuthRequired(ContainerRequestContext req) {
         String path = req.getUriInfo().getPath();
+        String method = req.getMethod();
+
 
         if (path.contains("login")) {
             return false;
         }
-        if (path.contains("health")) {
-            return false;
+
+        if (method.equals("GET")) {
+            if (path.startsWith("news") ||
+                path.startsWith("categories") ||
+                path.startsWith("reactions")) {
+                return false;
+            }
+        }
+
+        if (method.equals("POST")) {
+            if (path.startsWith("news/") && path.endsWith("/comments")) {
+                return false;
+            }
+            if (path.startsWith("news/") && path.endsWith("/visit")) {
+                return false;
+            }
+            if (path.startsWith("reactions/")) {
+                return false;
+            }
         }
 
         return true;
