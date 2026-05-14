@@ -50,6 +50,23 @@ public class UserService {
         }
     }
 
+    public User getUserFromToken(String authHeader) {
+        if (authHeader == null || authHeader.isEmpty()) {
+            return null;
+        }
+        String token = authHeader.startsWith("Bearer ") ? authHeader.substring(7) : authHeader;
+        try {
+            Algorithm algorithm = Algorithm.HMAC256("secret");
+            JWTVerifier verifier = JWT.require(algorithm).build();
+            DecodedJWT jwt = verifier.verify(token);
+
+            String email = jwt.getSubject();
+            return this.userRepository.findByEmail(email);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     public List<User> allUsers(int page, int pageSize) {
         return this.userRepository.findAll(page, pageSize);
     }

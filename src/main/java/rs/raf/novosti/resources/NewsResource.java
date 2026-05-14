@@ -1,7 +1,10 @@
 package rs.raf.novosti.resources;
 
 import rs.raf.novosti.entities.News;
+import rs.raf.novosti.entities.User;
+import rs.raf.novosti.entities.UserType;
 import rs.raf.novosti.services.NewsService;
+import rs.raf.novosti.services.UserService;
 
 import javax.inject.Inject;
 import javax.ws.rs.*;
@@ -16,6 +19,33 @@ public class NewsResource {
 
     @Inject
     private NewsService newsService;
+
+    @Inject
+    private UserService userService;
+
+    private Response requireAdminOrAuthor(String authHeader, Long newsId) {
+        User loggedIn = this.userService.getUserFromToken(authHeader);
+        if (loggedIn == null) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "Unauthorized");
+            return Response.status(Response.Status.UNAUTHORIZED).entity(error).build();
+        }
+        if (loggedIn.getUserType() == UserType.ADMIN) {
+            return null;  //admin moze sve
+        }
+        News news = this.newsService.findNews(newsId);
+        if (news == null) {
+            Map<String, String> error = new HashMap<>();
+            error.put("message", "News not found");
+            return Response.status(Response.Status.NOT_FOUND).entity(error).build();
+        }
+        if (!loggedIn.getId().equals(news.getAuthorId())) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "Access denied: only admin or news author can do this");
+            return Response.status(Response.Status.FORBIDDEN).entity(error).build();
+        }
+        return null;
+    }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -142,11 +172,20 @@ public class NewsResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response create(Map<String, Object> body) {
+    public Response create(@HeaderParam("Authorization") String authHeader,
+                           Map<String, Object> body) {
+
+        User loggedIn = this.userService.getUserFromToken(authHeader);
+        if (loggedIn == null) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "Unauthorized");
+            return Response.status(Response.Status.UNAUTHORIZED).entity(error).build();
+        }
+
         News news = new News();
         news.setTitle((String) body.get("title"));
         news.setText((String) body.get("text"));
-        news.setAuthorId(Long.valueOf(body.get("authorId").toString()));
+        news.setAuthorId(loggedIn.getId());
         news.setCategoryId(Long.valueOf(body.get("categoryId").toString()));
 
         List<String> tagValues = (List<String>) body.get("tags");
@@ -159,7 +198,12 @@ public class NewsResource {
     @Path("/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response update(@PathParam("id") Long id, Map<String, Object> body) {
+    public Response update(@HeaderParam("Authorization") String authHeader,
+                           @PathParam("id") Long id,
+                           Map<String, Object> body) {
+        Response forbidden = requireAdminOrAuthor(authHeader, id);
+        if (forbidden != null) return forbidden;
+
         News newsData = new News();
         newsData.setTitle((String) body.get("title"));
         newsData.setText((String) body.get("text"));
@@ -180,7 +224,11 @@ public class NewsResource {
     @DELETE
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response delete(@PathParam("id") Long id) {
+    public Response delete(@HeaderParam("Authorization") String authHeader,
+                           @PathParam("id") Long id) {
+        Response forbidden = requireAdminOrAuthor(authHeader, id);
+        if (forbidden != null) return forbidden;
+
         this.newsService.deleteNews(id);
         return Response.ok("{\"message\":\"News deleted\"}").build();
     }

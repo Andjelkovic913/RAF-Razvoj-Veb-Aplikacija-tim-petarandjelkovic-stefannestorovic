@@ -1,6 +1,7 @@
 package rs.raf.novosti.resources;
 
 import rs.raf.novosti.entities.User;
+import rs.raf.novosti.entities.UserType;
 import rs.raf.novosti.requests.CreateUserRequest;
 import rs.raf.novosti.requests.LoginRequest;
 import rs.raf.novosti.services.UserService;
@@ -19,6 +20,16 @@ public class UserResource {
 
     @Inject
     private UserService userService;
+
+    private Response requireAdmin(String authHeader) {
+        User loggedIn = this.userService.getUserFromToken(authHeader);
+        if (loggedIn == null || loggedIn.getUserType() != UserType.ADMIN) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "Access denied: admin only");
+            return Response.status(Response.Status.FORBIDDEN).entity(error).build();
+        }
+        return null;
+    }
 
     @POST
     @Path("/login")
@@ -39,8 +50,12 @@ public class UserResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response all(@QueryParam("page") @DefaultValue("1") int page,
+    public Response all(@HeaderParam("Authorization") String authHeader,
+                        @QueryParam("page") @DefaultValue("1") int page,
                         @QueryParam("pageSize") @DefaultValue("10") int pageSize) {
+
+        Response forbidden = requireAdmin(authHeader);
+        if (forbidden != null) return forbidden;
 
         List<User> users = this.userService.allUsers(page, pageSize);
         int total = this.userService.userCount();
@@ -57,7 +72,11 @@ public class UserResource {
     @GET
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response find(@PathParam("id") Long id) {
+    public Response find(@HeaderParam("Authorization") String authHeader,
+                         @PathParam("id") Long id) {
+        Response forbidden = requireAdmin(authHeader);
+        if (forbidden != null) return forbidden;
+
         User user = this.userService.findUser(id);
         if (user == null) {
             return Response.status(Response.Status.NOT_FOUND)
@@ -70,8 +89,11 @@ public class UserResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response create(@Valid CreateUserRequest request) {
-        // Provera da li se password i confirmPassword poklapaju (spec eksplicitno trazi)
+    public Response create(@HeaderParam("Authorization") String authHeader,
+                           @Valid CreateUserRequest request) {
+        Response forbidden = requireAdmin(authHeader);
+        if (forbidden != null) return forbidden;
+
         if (!request.getPassword().equals(request.getConfirmPassword())) {
             Map<String, String> error = new HashMap<>();
             error.put("message", "Password and confirmation do not match");
@@ -93,7 +115,12 @@ public class UserResource {
     @Path("/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response update(@PathParam("id") Long id, @Valid User userData) {
+    public Response update(@HeaderParam("Authorization") String authHeader,
+                           @PathParam("id") Long id,
+                           @Valid User userData) {
+        Response forbidden = requireAdmin(authHeader);
+        if (forbidden != null) return forbidden;
+
         User existing = this.userService.findUser(id);
         if (existing == null) {
             Map<String, String> error = new HashMap<>();
@@ -115,7 +142,11 @@ public class UserResource {
     @PUT
     @Path("/{id}/status")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response toggleStatus(@PathParam("id") Long id) {
+    public Response toggleStatus(@HeaderParam("Authorization") String authHeader,
+                                 @PathParam("id") Long id) {
+        Response forbidden = requireAdmin(authHeader);
+        if (forbidden != null) return forbidden;
+
         this.userService.toggleStatus(id);
         return Response.ok("{\"message\":\"Status updated\"}").build();
     }
