@@ -1,6 +1,7 @@
 package rs.raf.novosti.resources;
 
 import rs.raf.novosti.entities.User;
+import rs.raf.novosti.requests.CreateUserRequest;
 import rs.raf.novosti.requests.LoginRequest;
 import rs.raf.novosti.services.UserService;
 
@@ -69,13 +70,20 @@ public class UserResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response create(@Valid User user) {
-        User created = this.userService.addUser(user);
+    public Response create(@Valid CreateUserRequest request) {
+        // Provera da li se password i confirmPassword poklapaju (spec eksplicitno trazi)
+        if (!request.getPassword().equals(request.getConfirmPassword())) {
+            Map<String, String> error = new HashMap<>();
+            error.put("message", "Password and confirmation do not match");
+            return Response.status(Response.Status.BAD_REQUEST).entity(error).build();
+        }
+
+        User created = this.userService.addUser(request);
 
         if (created == null) {
             Map<String, String> error = new HashMap<>();
             error.put("message", "A user with this email already exists");
-            return Response.status(422, "Unprocessable Entity").entity(error).build();
+            return Response.status(Response.Status.CONFLICT).entity(error).build();
         }
 
         return Response.status(Response.Status.CREATED).entity(created).build();
@@ -86,12 +94,19 @@ public class UserResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response update(@PathParam("id") Long id, @Valid User userData) {
+        User existing = this.userService.findUser(id);
+        if (existing == null) {
+            Map<String, String> error = new HashMap<>();
+            error.put("message", "User not found");
+            return Response.status(Response.Status.NOT_FOUND).entity(error).build();
+        }
+
         User updated = this.userService.updateUser(id, userData);
 
         if (updated == null) {
             Map<String, String> error = new HashMap<>();
-            error.put("message", "User not found or email already taken");
-            return Response.status(422, "Unprocessable Entity").entity(error).build();
+            error.put("message", "Email already taken by another user");
+            return Response.status(Response.Status.CONFLICT).entity(error).build();
         }
 
         return Response.ok(updated).build();

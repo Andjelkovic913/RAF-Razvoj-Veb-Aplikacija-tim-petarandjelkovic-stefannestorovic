@@ -35,7 +35,6 @@ public class CategoryResource {
         return Response.ok(response).build();
     }
 
-    // bez paginacije — za dropdown i nav meni
     @GET
     @Path("/all")
     @Produces(MediaType.APPLICATION_JSON)
@@ -65,7 +64,7 @@ public class CategoryResource {
         if (created == null) {
             Map<String, String> error = new HashMap<>();
             error.put("message", "A category with this name already exists");
-            return Response.status(422, "Unprocessable Entity").entity(error).build();
+            return Response.status(Response.Status.CONFLICT).entity(error).build();
         }
 
         return Response.status(Response.Status.CREATED).entity(created).build();
@@ -76,12 +75,19 @@ public class CategoryResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response update(@PathParam("id") Long id, @Valid Category categoryData) {
+        Category existing = this.categoryService.findCategory(id);
+        if (existing == null) {
+            Map<String, String> error = new HashMap<>();
+            error.put("message", "Category not found");
+            return Response.status(Response.Status.NOT_FOUND).entity(error).build();
+        }
+
         Category updated = this.categoryService.updateCategory(id, categoryData);
 
         if (updated == null) {
             Map<String, String> error = new HashMap<>();
-            error.put("message", "Category not found or name already taken");
-            return Response.status(422, "Unprocessable Entity").entity(error).build();
+            error.put("message", "Name already taken by another category");
+            return Response.status(Response.Status.CONFLICT).entity(error).build();
         }
 
         return Response.ok(updated).build();
@@ -96,7 +102,7 @@ public class CategoryResource {
         if (!deleted) {
             Map<String, String> error = new HashMap<>();
             error.put("message", "Cannot delete category that contains news");
-            return Response.status(422, "Unprocessable Entity").entity(error).build();
+            return Response.status(Response.Status.CONFLICT).entity(error).build();
         }
 
         return Response.ok("{\"message\":\"Category deleted\"}").build();
