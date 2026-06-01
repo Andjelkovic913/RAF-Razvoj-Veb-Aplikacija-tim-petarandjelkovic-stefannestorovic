@@ -43,6 +43,13 @@ public class AuthFilter implements ContainerRequestFilter {
         String path = req.getUriInfo().getPath();
         String method = req.getMethod();
 
+        // CORS preflight - browser pre svakog "kompleksnog" requesta posalje
+        // OPTIONS bez Authorization header-a da pita server da li sme da posalje pravi request.
+        // Moramo da ga propustimo bez auth provere - inace bi svi POST/PUT/DELETE
+        // pucali sa 401 jos pre nego sto bi pravi request bio poslat.
+        if (method.equals("OPTIONS")) {
+            return false;
+        }
 
         if (path.contains("login")) {
             return false;
