@@ -1,0 +1,255 @@
+{
+  "info": {
+    "name": "RAF Novosti - Backend",
+    "description": "Kolekcija za testiranje backend endpoint-a. Login automatski cuva JWT u kolekcionoj varijabli {{jwt}}.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080/api", "type": "string" },
+    { "key": "jwt", "value": "", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "0 - Auth",
+      "item": [
+        {
+          "name": "Login admin (cuva token u {{jwt}})",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.jwt) {",
+                  "    pm.collectionVariables.set('jwt', json.jwt);",
+                  "    console.log('JWT sacuvan u varijablu jwt');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"admin@raf.rs\",\n    \"password\": \"admin\"\n}"
+            },
+            "url": "{{baseUrl}}/users/login"
+          }
+        },
+        {
+          "name": "Login pogresna lozinka (ocekuje 401)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"admin@raf.rs\",\n    \"password\": \"pogresno\"\n}"
+            },
+            "url": "{{baseUrl}}/users/login"
+          }
+        }
+      ]
+    },
+    {
+      "name": "1 - Javni GET-ovi (BEZ tokena)",
+      "item": [
+        {
+          "name": "J1: GET sve vesti",
+          "request": { "method": "GET", "url": "{{baseUrl}}/news" }
+        },
+        {
+          "name": "J2: GET vest po id",
+          "request": { "method": "GET", "url": "{{baseUrl}}/news/1" }
+        },
+        {
+          "name": "J3: GET search ?q=Apple",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/news/search?q=Apple",
+              "host": ["{{baseUrl}}"],
+              "path": ["news", "search"],
+              "query": [{ "key": "q", "value": "Apple" }]
+            }
+          }
+        },
+        {
+          "name": "J4: GET najcitanije",
+          "request": { "method": "GET", "url": "{{baseUrl}}/news/most-read" }
+        },
+        {
+          "name": "J5: GET top reakcije",
+          "request": { "method": "GET", "url": "{{baseUrl}}/news/top-reactions" }
+        },
+        {
+          "name": "J6: GET by-tag sport",
+          "request": { "method": "GET", "url": "{{baseUrl}}/news/by-tag/sport" }
+        },
+        {
+          "name": "J6b: GET by-category 1 (Sport)",
+          "request": { "method": "GET", "url": "{{baseUrl}}/news/by-category/1" }
+        },
+        {
+          "name": "J6c: GET related za vest 1",
+          "request": { "method": "GET", "url": "{{baseUrl}}/news/1/related" }
+        },
+        {
+          "name": "J7: GET sve kategorije",
+          "request": { "method": "GET", "url": "{{baseUrl}}/categories" }
+        },
+        {
+          "name": "J8: GET komentari za vest 1",
+          "request": { "method": "GET", "url": "{{baseUrl}}/news/1/comments" }
+        }
+      ]
+    },
+    {
+      "name": "2 - Javni POST-ovi (BEZ tokena)",
+      "item": [
+        {
+          "name": "J9: POST komentar na vest 1",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"newsId\": 1,\n    \"authorName\": \"Anoniman gost\",\n    \"text\": \"Test komentar bez logovanja\"\n}"
+            },
+            "url": "{{baseUrl}}/news/1/comments"
+          }
+        },
+        {
+          "name": "J10: POST poseta na vest 1",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"sessionId\": \"test-session-12345\"\n}"
+            },
+            "url": "{{baseUrl}}/news/1/visit"
+          }
+        },
+        {
+          "name": "J11a: POST LIKE na vest 1",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"sessionId\": \"test-session-12345\",\n    \"type\": \"LIKE\"\n}"
+            },
+            "url": "{{baseUrl}}/reactions/news/1"
+          }
+        },
+        {
+          "name": "J11b: POST DISLIKE na komentar 1",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"sessionId\": \"test-session-12345\",\n    \"type\": \"DISLIKE\"\n}"
+            },
+            "url": "{{baseUrl}}/reactions/comments/1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "3 - Zasticeno BEZ tokena (ocekuje 401)",
+      "item": [
+        {
+          "name": "Z1: POST nova vest (401)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"title\": \"Test\",\n    \"text\": \"Test\",\n    \"authorId\": 1,\n    \"categoryId\": 1,\n    \"tags\": []\n}"
+            },
+            "url": "{{baseUrl}}/news"
+          }
+        },
+        {
+          "name": "Z2: PUT izmena vesti (401)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"title\": \"Izmena\",\n    \"text\": \"Izmena\",\n    \"categoryId\": 1,\n    \"tags\": []\n}"
+            },
+            "url": "{{baseUrl}}/news/1"
+          }
+        },
+        {
+          "name": "Z3: DELETE vest (401)",
+          "request": { "method": "DELETE", "url": "{{baseUrl}}/news/1" }
+        },
+        {
+          "name": "Z4: POST nova kategorija (401)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Test\",\n    \"description\": \"Test opis\"\n}"
+            },
+            "url": "{{baseUrl}}/categories"
+          }
+        },
+        {
+          "name": "Z5: GET svi korisnici (401)",
+          "request": { "method": "GET", "url": "{{baseUrl}}/users" }
+        }
+      ]
+    },
+    {
+      "name": "4 - Zasticeno SA tokenom (ocekuje 200/201)",
+      "item": [
+        {
+          "name": "Z1+: POST nova vest (sa JWT)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{jwt}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"title\": \"Test vest sa autentifikacijom\",\n    \"text\": \"Tekst nove test vesti, dovoljno dugacak da prodje validaciju.\",\n    \"authorId\": 1,\n    \"categoryId\": 2,\n    \"tags\": [\"test\", \"automated\"]\n}"
+            },
+            "url": "{{baseUrl}}/news"
+          }
+        },
+        {
+          "name": "Z5+: GET svi korisnici (sa JWT)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{jwt}}" }],
+            "url": "{{baseUrl}}/users"
+          }
+        },
+        {
+          "name": "Z+: POST nova kategorija (sa JWT)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{jwt}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Test kategorija\",\n    \"description\": \"Test opis dovoljno dugacak\"\n}"
+            },
+            "url": "{{baseUrl}}/categories"
+          }
+        }
+      ]
+    }
+  ]
+}

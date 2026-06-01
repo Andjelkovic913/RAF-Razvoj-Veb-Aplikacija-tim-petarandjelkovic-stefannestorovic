@@ -1,0 +1,168 @@
+{
+  "info": {
+    "name": "RAF Novosti - Status Code Tests (404 / 409)",
+    "description": "Testovi za refaktor 422 -> 404/409. Pre pokretanja: prvo Login (folder 0) da se napuni {{jwt}}.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080/api", "type": "string" },
+    { "key": "jwt", "value": "", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "0 - Setup",
+      "item": [
+        {
+          "name": "Login admin (cuva token u {{jwt}})",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.jwt) {",
+                  "    pm.collectionVariables.set('jwt', json.jwt);",
+                  "    console.log('JWT sacuvan u varijablu jwt');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"admin@raf.rs\",\n    \"password\": \"admin\"\n}"
+            },
+            "url": "{{baseUrl}}/users/login"
+          }
+        }
+      ]
+    },
+    {
+      "name": "1 - Users (404 i 409)",
+      "item": [
+        {
+          "name": "404: PUT /users/999 (user ne postoji)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{jwt}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"nepostojeci@raf.rs\",\n    \"name\": \"Ne\",\n    \"surname\": \"Postoji\",\n    \"userType\": \"CREATOR\"\n}"
+            },
+            "url": "{{baseUrl}}/users/999"
+          }
+        },
+        {
+          "name": "409: POST /users sa postojecim emailom (admin@raf.rs)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{jwt}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"admin@raf.rs\",\n    \"name\": \"Duplikat\",\n    \"surname\": \"Test\",\n    \"userType\": \"CREATOR\",\n    \"hashedPassword\": \"abc\"\n}"
+            },
+            "url": "{{baseUrl}}/users"
+          }
+        },
+        {
+          "name": "409: PUT /users/2 sa email = admin@raf.rs (zauzet od id=1)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{jwt}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"admin@raf.rs\",\n    \"name\": \"Petar\",\n    \"surname\": \"Petrovic\",\n    \"userType\": \"CREATOR\"\n}"
+            },
+            "url": "{{baseUrl}}/users/2"
+          }
+        },
+        {
+          "name": "200: PUT /users/2 sa neutralnim emailom (sanity, treba da prodje)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{jwt}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"petar@raf.rs\",\n    \"name\": \"Petar\",\n    \"surname\": \"Petrovic\",\n    \"userType\": \"CREATOR\"\n}"
+            },
+            "url": "{{baseUrl}}/users/2"
+          }
+        }
+      ]
+    },
+    {
+      "name": "2 - Categories (404 i 409)",
+      "item": [
+        {
+          "name": "409: POST /categories sa name = Sport (postoji)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{jwt}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Sport\",\n    \"description\": \"Duplikat ime za test\"\n}"
+            },
+            "url": "{{baseUrl}}/categories"
+          }
+        },
+        {
+          "name": "404: PUT /categories/999 (ne postoji)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{jwt}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Nepostojeca\",\n    \"description\": \"Nema je\"\n}"
+            },
+            "url": "{{baseUrl}}/categories/999"
+          }
+        },
+        {
+          "name": "409: PUT /categories/2 (Tehnologija) sa name = Sport (zauzet od id=1)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{jwt}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Sport\",\n    \"description\": \"Pokusaj zauzimanja postojeceg imena\"\n}"
+            },
+            "url": "{{baseUrl}}/categories/2"
+          }
+        },
+        {
+          "name": "409: DELETE /categories/1 (Sport, ima vesti)",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{jwt}}" }],
+            "url": "{{baseUrl}}/categories/1"
+          }
+        }
+      ]
+    }
+  ]
+}

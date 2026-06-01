@@ -1,0 +1,284 @@
+{
+  "info": {
+    "name": "RAF Novosti - Authorization Tests (admin-only + autor/admin)",
+    "description": "Testovi za B fazu - autorizaciju. Pokreni prvo folder '0 - Auth' da se napune varijable adminJwt, petarJwt, markoJwt. Onda folderi 1 i 2.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080/api", "type": "string" },
+    { "key": "adminJwt", "value": "", "type": "string" },
+    { "key": "petarJwt", "value": "", "type": "string" },
+    { "key": "markoJwt", "value": "", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "0 - Auth (pokreni redom)",
+      "item": [
+        {
+          "name": "Login admin -> {{adminJwt}}",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j = pm.response.json();",
+                  "if (j.jwt) { pm.collectionVariables.set('adminJwt', j.jwt); console.log('adminJwt sacuvan'); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"admin@raf.rs\",\n    \"password\": \"admin\"\n}"
+            },
+            "url": "{{baseUrl}}/users/login"
+          }
+        },
+        {
+          "name": "Login petar -> {{petarJwt}}",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j = pm.response.json();",
+                  "if (j.jwt) { pm.collectionVariables.set('petarJwt', j.jwt); console.log('petarJwt sacuvan'); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"petar@raf.rs\",\n    \"password\": \"petar1\"\n}"
+            },
+            "url": "{{baseUrl}}/users/login"
+          }
+        },
+        {
+          "name": "Login marko -> {{markoJwt}}",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j = pm.response.json();",
+                  "if (j.jwt) { pm.collectionVariables.set('markoJwt', j.jwt); console.log('markoJwt sacuvan'); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"marko@raf.rs\",\n    \"password\": \"marko1\"\n}"
+            },
+            "url": "{{baseUrl}}/users/login"
+          }
+        }
+      ]
+    },
+    {
+      "name": "1 - Users admin-only",
+      "item": [
+        {
+          "name": "1: GET /users sa ADMIN (ocekuje 200)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminJwt}}" }],
+            "url": "{{baseUrl}}/users"
+          }
+        },
+        {
+          "name": "2: GET /users sa PETAR (ocekuje 403)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{petarJwt}}" }],
+            "url": "{{baseUrl}}/users"
+          }
+        },
+        {
+          "name": "3: POST /users sa ADMIN (ocekuje 201)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminJwt}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"novi-creator@raf.rs\",\n    \"name\": \"Novi\",\n    \"surname\": \"Creator\",\n    \"userType\": \"CREATOR\",\n    \"password\": \"novi123\",\n    \"confirmPassword\": \"novi123\"\n}"
+            },
+            "url": "{{baseUrl}}/users"
+          }
+        },
+        {
+          "name": "4: POST /users sa PETAR (ocekuje 403)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{petarJwt}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"napad-creator@raf.rs\",\n    \"name\": \"Napad\",\n    \"surname\": \"Creator\",\n    \"userType\": \"CREATOR\",\n    \"password\": \"x\",\n    \"confirmPassword\": \"x\"\n}"
+            },
+            "url": "{{baseUrl}}/users"
+          }
+        },
+        {
+          "name": "5: PUT /users/2 sa PETAR (ocekuje 403)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{petarJwt}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"petar@raf.rs\",\n    \"name\": \"Petar samopromena\",\n    \"surname\": \"Petrovic\",\n    \"userType\": \"CREATOR\"\n}"
+            },
+            "url": "{{baseUrl}}/users/2"
+          }
+        },
+        {
+          "name": "6: PUT /users/2 sa ADMIN (ocekuje 200)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminJwt}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"petar@raf.rs\",\n    \"name\": \"Petar\",\n    \"surname\": \"Petrovic\",\n    \"userType\": \"CREATOR\"\n}"
+            },
+            "url": "{{baseUrl}}/users/2"
+          }
+        }
+      ]
+    },
+    {
+      "name": "2 - News authorization",
+      "item": [
+        {
+          "name": "7: POST /news sa PETAR (authorId iz JWT-a, ocekuje 201 + authorId=2)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{petarJwt}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"title\": \"Petrova nova vest\",\n    \"text\": \"Tekst vesti koju je napisao Petar - testira da li authorId dolazi iz JWT-a, ignorisuci body.\",\n    \"categoryId\": 2,\n    \"tags\": [\"test-autor\"]\n}"
+            },
+            "url": "{{baseUrl}}/news"
+          }
+        },
+        {
+          "name": "7b: POST /news sa PETAR + authorId=999 u body-ju (i dalje treba authorId=2 iz JWT-a)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{petarJwt}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"title\": \"Pokusaj potpisa u tudje ime\",\n    \"text\": \"Petar pokusava da kreira vest sa authorId=999 u body-ju. Backend ignorise i koristi authorId=2 iz JWT-a.\",\n    \"authorId\": 999,\n    \"categoryId\": 2,\n    \"tags\": []\n}"
+            },
+            "url": "{{baseUrl}}/news"
+          }
+        },
+        {
+          "name": "8: PUT /news/1 sa PETAR (Petar je autor vesti 1, ocekuje 200)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{petarJwt}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"title\": \"Djokovic osvojio Australian Open (Petar update)\",\n    \"text\": \"Novak Djokovic je u dramaticnom finalu... [updated by autor]\",\n    \"categoryId\": 1,\n    \"tags\": [\"tenis\", \"djokovic\", \"sport\"]\n}"
+            },
+            "url": "{{baseUrl}}/news/1"
+          }
+        },
+        {
+          "name": "9: PUT /news/1 sa ADMIN (admin sve moze, ocekuje 200)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminJwt}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"title\": \"Djokovic osvojio Australian Open (Admin update)\",\n    \"text\": \"Admin moze sve. Updateuje tudju vest.\",\n    \"categoryId\": 1,\n    \"tags\": [\"tenis\", \"djokovic\", \"sport\"]\n}"
+            },
+            "url": "{{baseUrl}}/news/1"
+          }
+        },
+        {
+          "name": "10: PUT /news/1 sa MARKO (NIJE autor, ocekuje 403)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{markoJwt}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"title\": \"Marko pokusava da updateuje Petrovu vest\",\n    \"text\": \"Marko nije autor, ovo treba da bude blokirano.\",\n    \"categoryId\": 1,\n    \"tags\": []\n}"
+            },
+            "url": "{{baseUrl}}/news/1"
+          }
+        },
+        {
+          "name": "11: DELETE /news/2 sa PETAR (autor je Marko, ocekuje 403)",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{petarJwt}}" }],
+            "url": "{{baseUrl}}/news/2"
+          }
+        },
+        {
+          "name": "12: DELETE /news/2 sa ADMIN (ocekuje 200) - PAZLJIVO, vest se zaista brise",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminJwt}}" }],
+            "url": "{{baseUrl}}/news/2"
+          }
+        },
+        {
+          "name": "13: PUT /news/9999 sa PETAR (vest ne postoji, ocekuje 404)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{petarJwt}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"title\": \"x\",\n    \"text\": \"x\",\n    \"categoryId\": 1,\n    \"tags\": []\n}"
+            },
+            "url": "{{baseUrl}}/news/9999"
+          }
+        }
+      ]
+    }
+  ]
+}
