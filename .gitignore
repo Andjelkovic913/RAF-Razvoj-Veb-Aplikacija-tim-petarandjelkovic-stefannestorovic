@@ -1,37 +1,50 @@
-target/
-out/
-!.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
-.kotlin
+# ============================================================
+# RAF Novosti - monorepo .gitignore
+# Backend (backend/) i Frontend (frontend/) idu u git.
+# Sve ostalo (demo, dokumentacija, build artefakti) - NE.
+# ============================================================
 
-### IntelliJ IDEA ###
+# ---------- Demo reference (samo lokalno) ----------
+demo/
+demo2/
+react-demo/
+
+# ---------- Projektna dokumentacija (lokalno za tim) ----------
+*.md
+specifikacija.md
+CLAUDE.md
+TODO.md
+
+# ---------- IDE ----------
 .idea/
-*.iws
 *.iml
+*.iws
 *.ipr
-
-### Eclipse ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
-
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
-
-### VS Code ###
 .vscode/
 
-### Mac OS ###
+# ---------- OS ----------
 .DS_Store
+Thumbs.db
+
+# ---------- Logs ----------
+*.log
+
+# ---------- Build output ----------
+**/target/
+**/out/
+**/build/
+**/dist/
+
+# ---------- Node (frontend) ----------
+node_modules/
+.env
+.env.local
+.env.*.local
+.parcel-cache/
+
+# ---------- Vite ----------
+frontend/dist/
+frontend/.vite/
+
+# ---------- Maven wrapper extras ----------
+.mvn/wrapper/maven-wrapper.jar.bak
