@@ -85,7 +85,7 @@ const NavigationBar = () => {
                         )}
                     </Nav>
 
-                    <Nav>
+                    <Nav className="align-items-center">
                         {isAuthenticated() && (
                             <NavDropdown title="CMS" id="cms-dropdown" align="end">
                                 <NavDropdown.Item
@@ -109,13 +109,26 @@ const NavigationBar = () => {
 
                         {isAuthenticated() ? (
                             <>
-                                <Navbar.Text className="me-3">
+                                <Navbar.Text className="me-3 text-nowrap">
                                     {user?.sub} ({user?.role})
                                 </Navbar.Text>
-                                <Button variant="danger" onClick={() => logout(navigate)}>Logout</Button>
+                                <Button
+                                    variant="danger"
+                                    size="sm"
+                                    onClick={() => logout(navigate)}
+                                >
+                                    Logout
+                                </Button>
                             </>
                         ) : (
-                            <Button variant="success" as={Link} to="/login">Login</Button>
+                            <Button
+                                variant="success"
+                                size="sm"
+                                as={Link}
+                                to="/login"
+                            >
+                                Login
+                            </Button>
                         )}
                     </Nav>
                 </Navbar.Collapse>

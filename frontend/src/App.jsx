@@ -40,10 +40,8 @@ function App() {
                             <Route path="/" element={<HomePage />} />
                             <Route path="/login" element={<LoginPage />} />
 
-                            {/* Javna platforma za citanje */}
                             <Route path="/kategorije" element={<AllCategoriesPage />} />
 
-                            {/* CMS rute - svi pod /cms/ prefiksom */}
                             <Route path="/cms/users" element={<AdminRoute element={<UsersPage />} />} />
                             <Route path="/cms/categories" element={<PrivateRoute element={<CategoriesPage />} />} />
                             <Route path="/cms/categories/new" element={<PrivateRoute element={<CategoryFormPage />} />} />
