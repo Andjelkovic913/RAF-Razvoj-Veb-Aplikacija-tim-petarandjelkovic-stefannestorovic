@@ -15,9 +15,12 @@ public class CategoryService {
         return this.categoryRepository.findAll(page, pageSize);
     }
 
-    // bez paginacije — za dropdown i navigaciju
     public List<Category> allCategories() {
         return this.categoryRepository.findAll();
+    }
+
+    public List<Category> allCategoriesWithCounts() {
+        return this.categoryRepository.findAllWithCounts();
     }
 
     public int categoryCount() {
@@ -29,7 +32,6 @@ public class CategoryService {
     }
 
     public Category addCategory(Category category) {
-        // da li ime vec postoji
         Category existing = this.categoryRepository.findByName(category.getName());
         if (existing != null) {
             return null;
@@ -43,7 +45,6 @@ public class CategoryService {
             return null;
         }
 
-        // da li novo ime vec postoji kod druge kategorije
         Category nameCategory = this.categoryRepository.findByName(categoryData.getName());
         if (nameCategory != null && !nameCategory.getId().equals(id)) {
             return null;
@@ -56,7 +57,6 @@ public class CategoryService {
     }
 
     public boolean deleteCategory(Long id) {
-        // ne moze brisanje ako ima vesti u kategoriji
         int newsCount = this.categoryRepository.countNewsByCategoryId(id);
         if (newsCount > 0) {
             return false;

@@ -14,6 +14,7 @@ public class Category {
     @NotNull(message = "Description field is required")
     @NotEmpty(message = "Description field is required")
     private String description;
+    private Integer newsCount;
 
     public Category() {
     }
@@ -22,6 +23,14 @@ public class Category {
         this.id = id;
         this.name = name;
         this.description = description;
+    }
+
+    public Integer getNewsCount() {
+        return newsCount;
+    }
+
+    public void setNewsCount(Integer newsCount) {
+        this.newsCount = newsCount;
     }
 
     public Long getId() {

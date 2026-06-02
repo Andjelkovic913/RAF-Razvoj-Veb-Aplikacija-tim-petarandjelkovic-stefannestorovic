@@ -43,6 +43,13 @@ public class CategoryResource {
     }
 
     @GET
+    @Path("/with-counts")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response allWithCounts() {
+        return Response.ok(this.categoryService.allCategoriesWithCounts()).build();
+    }
+
+    @GET
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response find(@PathParam("id") Long id) {

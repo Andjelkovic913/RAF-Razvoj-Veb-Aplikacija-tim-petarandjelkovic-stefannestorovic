@@ -243,6 +243,40 @@ public class PostgresCategoryRepository extends PostgresAbstractRepository imple
         }
     }
 
+    @Override
+    public List<Category> findAllWithCounts() {
+        List<Category> categories = new ArrayList<>();
+
+        Connection connection = null;
+        Statement statement = null;
+        ResultSet resultSet = null;
+        try {
+            connection = this.newConnection();
+            statement = connection.createStatement();
+
+            resultSet = statement.executeQuery(
+                "SELECT c.category_id, c.name, c.description, COUNT(n.news_id) AS news_count " +
+                "FROM categories c " +
+                "LEFT JOIN news n ON n.category_id = c.category_id " +
+                "GROUP BY c.category_id, c.name, c.description " +
+                "ORDER BY COUNT(n.news_id) DESC, c.name ASC"
+            );
+            while (resultSet.next()) {
+                Category category = mapRow(resultSet);
+                category.setNewsCount(resultSet.getInt("news_count"));
+                categories.add(category);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            this.closeResultSet(resultSet);
+            this.closeStatement(statement);
+            this.closeConnection(connection);
+        }
+
+        return categories;
+    }
+
     private Category mapRow(ResultSet resultSet) throws SQLException {
         Category category = new Category();
         category.setId(resultSet.getLong("category_id"));

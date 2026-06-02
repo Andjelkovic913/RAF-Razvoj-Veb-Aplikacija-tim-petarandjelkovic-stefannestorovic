@@ -8,7 +8,7 @@ CREATE TABLE users (
     surname   VARCHAR(100) NOT NULL,
     user_type user_type    NOT NULL,
     status    BOOLEAN      NOT NULL DEFAULT TRUE,
-    password  VARCHAR(64)  NOT NULL  -- SHA-256 hex = 64 karaktera
+    password  VARCHAR(64)  NOT NULL
 );
 
 CREATE TABLE categories (
