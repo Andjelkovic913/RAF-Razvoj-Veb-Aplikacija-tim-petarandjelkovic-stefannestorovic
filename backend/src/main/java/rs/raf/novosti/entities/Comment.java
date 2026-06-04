@@ -8,7 +8,6 @@ public class Comment {
 
     private Long id;
 
-    @NotNull(message = "News ID is required")
     private Long newsId;
 
     @NotNull(message = "Author name is required")
