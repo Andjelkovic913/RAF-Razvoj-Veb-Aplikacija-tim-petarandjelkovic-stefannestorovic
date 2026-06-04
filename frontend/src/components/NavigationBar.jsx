@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Navbar, Nav, Container, Button, NavDropdown } from "react-bootstrap";
+import { Navbar, Nav, Container, Button, NavDropdown, Form, FormControl } from "react-bootstrap";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { isAuthenticated, isAdmin, getCurrentUser, logout } from "../auth.js";
 import _axios from "../axiosInstance";
@@ -14,9 +14,19 @@ const NavigationBar = () => {
     const user = getCurrentUser();
 
     const [categories, setCategories] = useState([]);
+    const [searchQuery, setSearchQuery] = useState("");
+
+    const handleSearch = (e) => {
+        e.preventDefault();
+        const q = searchQuery.trim();
+        if (q) {
+            navigate(`/pretraga?q=${encodeURIComponent(q)}`);
+            setSearchQuery("");
+        }
+    };
 
     useEffect(() => {
-        _axios.get("/api/categories/with-counts")
+        _axios.get("/api/categories/all")
             .then((response) => setCategories(response.data || []))
             .catch((err) => {
                 console.error("Greska pri ucitavanju kategorija:", err);
@@ -84,6 +94,21 @@ const NavigationBar = () => {
                             </NavDropdown>
                         )}
                     </Nav>
+
+                    <Form onSubmit={handleSearch} className="d-flex me-3">
+                        <FormControl
+                            type="search"
+                            placeholder="Pretraga vesti..."
+                            size="sm"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="me-2"
+                            style={{ minWidth: "200px" }}
+                        />
+                        <Button type="submit" variant="light" size="sm">
+                            Pretrazi
+                        </Button>
+                    </Form>
 
                     <Nav className="align-items-center">
                         {isAuthenticated() && (

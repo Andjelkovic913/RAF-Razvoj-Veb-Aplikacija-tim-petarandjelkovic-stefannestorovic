@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Container, Card, Spinner, Alert, Row, Col, Badge } from 'react-bootstrap';
 import _axios from '../axiosInstance';
+import TopReactionsSidebar from '../components/TopReactionsSidebar';
 
 const HomePage = () => {
     const [news, setNews] = useState([]);
@@ -40,9 +41,9 @@ const HomePage = () => {
         <Container className="mt-4">
             <h1 className="mb-4">Najnovije vesti</h1>
             <Row>
-                {news.map((item) => (
-                    <Col key={item.id} md={6} className="mb-3">
-                        <Card>
+                <Col md={8}>
+                    {news.map((item) => (
+                        <Card key={item.id} className="mb-3">
                             <Card.Body>
                                 <Card.Title>{item.title}</Card.Title>
                                 <Card.Subtitle className="mb-2 text-muted">
@@ -65,8 +66,12 @@ const HomePage = () => {
                                 </div>
                             </Card.Body>
                         </Card>
-                    </Col>
-                ))}
+                    ))}
+                </Col>
+
+                <Col md={4}>
+                    <TopReactionsSidebar />
+                </Col>
             </Row>
         </Container>
     );

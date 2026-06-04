@@ -9,7 +9,7 @@ const AllCategoriesPage = () => {
     const [error, setError] = useState('');
 
     useEffect(() => {
-        _axios.get('/api/categories/with-counts')
+        _axios.get('/api/categories/all')
             .then((response) => {
                 setCategories(response.data || []);
                 setLoading(false);

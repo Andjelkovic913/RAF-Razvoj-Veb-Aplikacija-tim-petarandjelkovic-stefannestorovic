@@ -12,6 +12,9 @@ const UsersPage = lazy(() => import("./pages/UsersPage"));
 const CategoriesPage = lazy(() => import("./pages/CategoriesPage"));
 const CategoryFormPage = lazy(() => import("./pages/CategoryFormPage"));
 const AllCategoriesPage = lazy(() => import("./pages/AllCategoriesPage"));
+const CategoryNewsPage = lazy(() => import("./pages/CategoryNewsPage"));
+const NajcitanijePage = lazy(() => import("./pages/NajcitanijePage"));
+const SearchPage = lazy(() => import("./pages/SearchPage"));
 
 const PrivateRoute = ({ element }) => {
     return isAuthenticated() ? element : <Navigate to="/login" />;
@@ -40,7 +43,11 @@ function App() {
                             <Route path="/" element={<HomePage />} />
                             <Route path="/login" element={<LoginPage />} />
 
+                            <Route path="/najcitanije" element={<NajcitanijePage />} />
+                            <Route path="/pretraga" element={<SearchPage />} />
+
                             <Route path="/kategorije" element={<AllCategoriesPage />} />
+                            <Route path="/kategorije/:id" element={<CategoryNewsPage />} />
 
                             <Route path="/cms/users" element={<AdminRoute element={<UsersPage />} />} />
                             <Route path="/cms/categories" element={<PrivateRoute element={<CategoriesPage />} />} />
