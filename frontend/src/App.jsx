@@ -14,6 +14,7 @@ const NajcitanijePage = lazy(() => import("./pages/NajcitanijePage"));
 const SearchPage = lazy(() => import("./pages/SearchPage"));
 
 const CmsUsersPage = lazy(() => import("./pages/CmsUsersPage"));
+const CmsUserFormPage = lazy(() => import("./pages/CmsUserFormPage"));
 const CmsCategoriesPage = lazy(() => import("./pages/CmsCategoriesPage"));
 const CmsCategoryFormPage = lazy(() => import("./pages/CmsCategoryFormPage"));
 const CmsNewsListPage = lazy(() => import("./pages/CmsNewsListPage"));
@@ -53,6 +54,8 @@ function App() {
                             <Route path="/kategorije/:id" element={<CategoryNewsPage />} />
 
                             <Route path="/cms/users" element={<AdminRoute element={<CmsUsersPage />} />} />
+                            <Route path="/cms/users/new" element={<AdminRoute element={<CmsUserFormPage />} />} />
+                            <Route path="/cms/users/:id/edit" element={<AdminRoute element={<CmsUserFormPage />} />} />
                             <Route path="/cms/categories" element={<PrivateRoute element={<CmsCategoriesPage />} />} />
                             <Route path="/cms/categories/new" element={<PrivateRoute element={<CmsCategoryFormPage />} />} />
                             <Route path="/cms/categories/:id/edit" element={<PrivateRoute element={<CmsCategoryFormPage />} />} />
