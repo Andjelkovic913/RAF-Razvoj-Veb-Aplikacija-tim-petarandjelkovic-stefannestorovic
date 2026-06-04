@@ -128,13 +128,13 @@ const CategoryNewsPage = () => {
                                         <div className="d-flex justify-content-between align-items-center mt-3">
                                             <div>
                                                 {item.tags?.map((tag) => (
-                                                    <Badge
+                                                    <Link
                                                         key={tag.id}
-                                                        bg="secondary"
-                                                        className="me-1"
+                                                        to={`/tagovi/${encodeURIComponent(tag.value)}`}
+                                                        className="text-decoration-none me-1"
                                                     >
-                                                        {tag.value}
-                                                    </Badge>
+                                                        <Badge bg="secondary">#{tag.value}</Badge>
+                                                    </Link>
                                                 ))}
                                             </div>
                                             <small className="text-muted">

@@ -5,6 +5,8 @@ import {
 } from 'react-bootstrap';
 import _axios from '../axiosInstance';
 import TopReactionsSidebar from '../components/TopReactionsSidebar';
+import CommentsSection from '../components/CommentsSection';
+import { getSessionId } from '../session';
 
 const NewsDetailPage = () => {
     const { id } = useParams();
@@ -25,6 +27,14 @@ const NewsDetailPage = () => {
             .then((response) => {
                 setNews(response.data);
                 setLoading(false);
+
+                _axios.post(`/api/news/${id}/visit`, { sessionId: getSessionId() })
+                    .then((visitResponse) => {
+                        if (visitResponse.data?.newVisit) {
+                            setNews((prev) => prev ? { ...prev, numberOfVisits: prev.numberOfVisits + 1 } : prev);
+                        }
+                    })
+                    .catch((err) => console.error('Greska pri evidenciji posete:', err));
             })
             .catch((err) => {
                 console.error('Greska pri ucitavanju vesti:', err);
@@ -135,6 +145,8 @@ const NewsDetailPage = () => {
                             </>
                         )}
                     </article>
+
+                    <CommentsSection newsId={news.id} />
 
                     {related.length > 0 && (
                         <section className="mt-5">
