@@ -5,7 +5,7 @@ import _axios from '../axiosInstance';
 
 const PAGE_SIZE = 10;
 
-const CategoriesPage = () => {
+const CmsCategoriesPage = () => {
     const navigate = useNavigate();
 
     const [categories, setCategories] = useState([]);
@@ -103,7 +103,11 @@ const CategoriesPage = () => {
                             ) : categories.map((c) => (
                                 <tr key={c.id}>
                                     <td>{c.id}</td>
-                                    <td>{c.name}</td>
+                                    <td>
+                                        <Link to={`/cms/news?categoryId=${c.id}`} title="Prikazi vesti iz ove kategorije">
+                                            {c.name}
+                                        </Link>
+                                    </td>
                                     <td>{c.description}</td>
                                     <td>
                                         <Button
@@ -155,7 +159,6 @@ const CategoriesPage = () => {
                 </>
             )}
 
-            {/* Modal za potvrdu brisanja */}
             <Modal show={!!deleteTarget} onHide={() => setDeleteTarget(null)} centered>
                 <Modal.Header closeButton>
                     <Modal.Title>Potvrda brisanja</Modal.Title>
@@ -177,4 +180,4 @@ const CategoriesPage = () => {
     );
 };
 
-export default CategoriesPage;
+export default CmsCategoriesPage;

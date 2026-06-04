@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Container, Table, Spinner, Alert, Badge } from 'react-bootstrap';
 import _axios from '../axiosInstance';
 
-const UsersPage = () => {
+const CmsUsersPage = () => {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -66,4 +66,4 @@ const UsersPage = () => {
     );
 };
 
-export default UsersPage;
+export default CmsUsersPage;

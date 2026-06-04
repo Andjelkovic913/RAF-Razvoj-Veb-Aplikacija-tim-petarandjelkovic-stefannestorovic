@@ -8,13 +8,16 @@ import { isAuthenticated, isAdmin } from "./auth.js";
 
 const HomePage = lazy(() => import("./pages/HomePage"));
 const LoginPage = lazy(() => import("./pages/LoginPage"));
-const UsersPage = lazy(() => import("./pages/UsersPage"));
-const CategoriesPage = lazy(() => import("./pages/CategoriesPage"));
-const CategoryFormPage = lazy(() => import("./pages/CategoryFormPage"));
 const AllCategoriesPage = lazy(() => import("./pages/AllCategoriesPage"));
 const CategoryNewsPage = lazy(() => import("./pages/CategoryNewsPage"));
 const NajcitanijePage = lazy(() => import("./pages/NajcitanijePage"));
 const SearchPage = lazy(() => import("./pages/SearchPage"));
+
+const CmsUsersPage = lazy(() => import("./pages/CmsUsersPage"));
+const CmsCategoriesPage = lazy(() => import("./pages/CmsCategoriesPage"));
+const CmsCategoryFormPage = lazy(() => import("./pages/CmsCategoryFormPage"));
+const CmsNewsListPage = lazy(() => import("./pages/CmsNewsListPage"));
+const CmsNewsFormPage = lazy(() => import("./pages/CmsNewsFormPage"));
 
 const PrivateRoute = ({ element }) => {
     return isAuthenticated() ? element : <Navigate to="/login" />;
@@ -49,10 +52,13 @@ function App() {
                             <Route path="/kategorije" element={<AllCategoriesPage />} />
                             <Route path="/kategorije/:id" element={<CategoryNewsPage />} />
 
-                            <Route path="/cms/users" element={<AdminRoute element={<UsersPage />} />} />
-                            <Route path="/cms/categories" element={<PrivateRoute element={<CategoriesPage />} />} />
-                            <Route path="/cms/categories/new" element={<PrivateRoute element={<CategoryFormPage />} />} />
-                            <Route path="/cms/categories/:id/edit" element={<PrivateRoute element={<CategoryFormPage />} />} />
+                            <Route path="/cms/users" element={<AdminRoute element={<CmsUsersPage />} />} />
+                            <Route path="/cms/categories" element={<PrivateRoute element={<CmsCategoriesPage />} />} />
+                            <Route path="/cms/categories/new" element={<PrivateRoute element={<CmsCategoryFormPage />} />} />
+                            <Route path="/cms/categories/:id/edit" element={<PrivateRoute element={<CmsCategoryFormPage />} />} />
+                            <Route path="/cms/news" element={<PrivateRoute element={<CmsNewsListPage />} />} />
+                            <Route path="/cms/news/new" element={<PrivateRoute element={<CmsNewsFormPage />} />} />
+                            <Route path="/cms/news/:id/edit" element={<PrivateRoute element={<CmsNewsFormPage />} />} />
                         </Routes>
                     </Suspense>
                 </main>

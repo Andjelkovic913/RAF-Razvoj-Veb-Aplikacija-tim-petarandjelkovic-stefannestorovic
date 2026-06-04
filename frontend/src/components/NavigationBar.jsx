@@ -120,6 +120,13 @@ const NavigationBar = () => {
                                 >
                                     Kategorije
                                 </NavDropdown.Item>
+                                <NavDropdown.Item
+                                    as={Link}
+                                    to="/cms/news"
+                                    active={location.pathname.startsWith("/cms/news")}
+                                >
+                                    Vesti
+                                </NavDropdown.Item>
                                 {isAdmin() && (
                                     <NavDropdown.Item
                                         as={Link}

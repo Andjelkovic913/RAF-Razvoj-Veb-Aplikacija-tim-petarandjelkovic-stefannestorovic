@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Container, Card, Form, Button, Alert, Spinner } from 'react-bootstrap';
 import _axios from '../axiosInstance';
 
-const CategoryFormPage = () => {
+const CmsCategoryFormPage = () => {
     const navigate = useNavigate();
     const { id } = useParams();
     const isEdit = Boolean(id);
@@ -125,4 +125,4 @@ const CategoryFormPage = () => {
     );
 };
 
-export default CategoryFormPage;
+export default CmsCategoryFormPage;
