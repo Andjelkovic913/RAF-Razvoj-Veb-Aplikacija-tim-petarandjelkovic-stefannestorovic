@@ -12,6 +12,7 @@ const AllCategoriesPage = lazy(() => import("./pages/AllCategoriesPage"));
 const CategoryNewsPage = lazy(() => import("./pages/CategoryNewsPage"));
 const NajcitanijePage = lazy(() => import("./pages/NajcitanijePage"));
 const SearchPage = lazy(() => import("./pages/SearchPage"));
+const NewsDetailPage = lazy(() => import("./pages/NewsDetailPage"));
 
 const CmsUsersPage = lazy(() => import("./pages/CmsUsersPage"));
 const CmsUserFormPage = lazy(() => import("./pages/CmsUserFormPage"));
@@ -52,6 +53,8 @@ function App() {
 
                             <Route path="/kategorije" element={<AllCategoriesPage />} />
                             <Route path="/kategorije/:id" element={<CategoryNewsPage />} />
+
+                            <Route path="/vesti/:id" element={<NewsDetailPage />} />
 
                             <Route path="/cms/users" element={<AdminRoute element={<CmsUsersPage />} />} />
                             <Route path="/cms/users/new" element={<AdminRoute element={<CmsUserFormPage />} />} />

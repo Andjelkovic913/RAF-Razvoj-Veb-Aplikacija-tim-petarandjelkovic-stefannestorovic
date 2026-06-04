@@ -110,7 +110,13 @@ const CategoryNewsPage = () => {
                             {news.map((item) => (
                                 <Card key={item.id} className="mb-3">
                                     <Card.Body>
-                                        <Card.Title>{item.title}</Card.Title>
+                                        <Card.Title
+                                            as={Link}
+                                            to={`/vesti/${item.id}`}
+                                            className="text-decoration-none text-dark"
+                                        >
+                                            {item.title}
+                                        </Card.Title>
                                         <Card.Subtitle className="mb-2 text-muted">
                                             {item.authorName} • {new Date(item.publishedTime).toLocaleDateString('sr-RS')}
                                         </Card.Subtitle>

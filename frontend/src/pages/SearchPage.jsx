@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
 import { Container, Row, Col, Card, Spinner, Alert, Badge, Pagination } from 'react-bootstrap';
 import _axios from '../axiosInstance';
 import TopReactionsSidebar from '../components/TopReactionsSidebar';
@@ -81,7 +81,13 @@ const SearchPage = () => {
                             {news.map((item) => (
                                 <Card key={item.id} className="mb-3">
                                     <Card.Body>
-                                        <Card.Title>{item.title}</Card.Title>
+                                        <Card.Title
+                                            as={Link}
+                                            to={`/vesti/${item.id}`}
+                                            className="text-decoration-none text-dark"
+                                        >
+                                            {item.title}
+                                        </Card.Title>
                                         <Card.Subtitle className="mb-2 text-muted">
                                             {item.categoryName} • {item.authorName} • {new Date(item.publishedTime).toLocaleDateString('sr-RS')}
                                         </Card.Subtitle>
