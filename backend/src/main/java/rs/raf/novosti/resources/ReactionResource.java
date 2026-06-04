@@ -15,8 +15,6 @@ public class ReactionResource {
     @Inject
     private ReactionService reactionService;
 
-    // ==================== News reactions ====================
-
     @POST
     @Path("/news/{newsId}")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -44,8 +42,6 @@ public class ReactionResource {
         String reaction = this.reactionService.myNewsReaction(newsId, sessionId);
         return Response.ok("{\"reaction\":\"" + (reaction != null ? reaction : "") + "\"}").build();
     }
-
-    // ==================== Comment reactions ====================
 
     @POST
     @Path("/comments/{commentId}")

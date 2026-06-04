@@ -11,7 +11,6 @@ public class ReactionService {
     @Inject
     private ReactionRepository reactionRepository;
 
-    // news
     public void reactToNews(Long newsId, String sessionId, ReactionType type) {
         this.reactionRepository.addOrUpdateNewsReaction(newsId, sessionId, type);
     }
@@ -24,7 +23,6 @@ public class ReactionService {
         return this.reactionRepository.getNewsReaction(newsId, sessionId);
     }
 
-    // comments
     public void reactToComment(Long commentId, String sessionId, ReactionType type) {
         this.reactionRepository.addOrUpdateCommentReaction(commentId, sessionId, type);
     }

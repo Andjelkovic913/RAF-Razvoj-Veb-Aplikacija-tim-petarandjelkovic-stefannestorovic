@@ -33,7 +33,6 @@ public class RestApplication extends ResourceConfig {
         AbstractBinder binder = new AbstractBinder() {
             @Override
             protected void configure() {
-                // Repositories
                 this.bind(PostgresUserRepository.class).to(UserRepository.class).in(Singleton.class);
                 this.bind(PostgresCategoryRepository.class).to(CategoryRepository.class).in(Singleton.class);
                 this.bind(PostgresNewsRepository.class).to(NewsRepository.class).in(Singleton.class);
@@ -42,7 +41,6 @@ public class RestApplication extends ResourceConfig {
                 this.bind(PostgresReactionRepository.class).to(ReactionRepository.class).in(Singleton.class);
                 this.bind(PostgresVisitRepository.class).to(VisitRepository.class).in(Singleton.class);
 
-                // Services
                 this.bindAsContract(UserService.class);
                 this.bindAsContract(CategoryService.class);
                 this.bindAsContract(NewsService.class);

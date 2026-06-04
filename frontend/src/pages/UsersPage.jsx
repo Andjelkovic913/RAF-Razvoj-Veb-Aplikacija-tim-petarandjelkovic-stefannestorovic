@@ -22,8 +22,10 @@ const UsersPage = () => {
             });
     }, []);
 
-    if (loading) return <Container className="text-center mt-5"><Spinner animation="border" /></Container>;
-    if (error) return <Container className="mt-4"><Alert variant="danger">{error}</Alert></Container>;
+    if (loading)
+        return <Container className="text-center mt-5"><Spinner animation="border" /></Container>;
+    if (error)
+        return <Container className="mt-4"><Alert variant="danger">{error}</Alert></Container>;
 
     return (
         <Container className="mt-4">
