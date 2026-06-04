@@ -11,7 +11,6 @@ public class PostgresTagRepository extends PostgresAbstractRepository implements
 
     @Override
     public Tag findOrCreate(String value) {
-        // pokusaj naci postojeci
         Connection connection = null;
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
@@ -26,7 +25,6 @@ public class PostgresTagRepository extends PostgresAbstractRepository implements
                 return new Tag(resultSet.getLong("tag_id"), resultSet.getString("value"));
             }
 
-            // ne postoji — napravi novi
             this.closeResultSet(resultSet);
             this.closeStatement(preparedStatement);
 

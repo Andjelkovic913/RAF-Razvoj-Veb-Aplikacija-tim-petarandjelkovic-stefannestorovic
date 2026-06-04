@@ -9,6 +9,11 @@ import java.util.List;
 
 public class PostgresCategoryRepository extends PostgresAbstractRepository implements CategoryRepository {
 
+    private static final String SELECT_WITH_COUNT =
+        "SELECT c.category_id, c.name, c.description, COUNT(n.news_id) AS news_count " +
+        "FROM categories c " +
+        "LEFT JOIN news n ON n.category_id = c.category_id ";
+
     @Override
     public Category findById(Long id) {
         Category category = null;
@@ -18,7 +23,11 @@ public class PostgresCategoryRepository extends PostgresAbstractRepository imple
         ResultSet resultSet = null;
         try {
             connection = this.newConnection();
-            preparedStatement = connection.prepareStatement("SELECT * FROM categories WHERE category_id = ?");
+            preparedStatement = connection.prepareStatement(
+                SELECT_WITH_COUNT +
+                "WHERE c.category_id = ? " +
+                "GROUP BY c.category_id, c.name, c.description"
+            );
             preparedStatement.setLong(1, id);
             resultSet = preparedStatement.executeQuery();
 
@@ -45,7 +54,11 @@ public class PostgresCategoryRepository extends PostgresAbstractRepository imple
         ResultSet resultSet = null;
         try {
             connection = this.newConnection();
-            preparedStatement = connection.prepareStatement("SELECT * FROM categories WHERE name = ?");
+            preparedStatement = connection.prepareStatement(
+                SELECT_WITH_COUNT +
+                "WHERE c.name = ? " +
+                "GROUP BY c.category_id, c.name, c.description"
+            );
             preparedStatement.setString(1, name);
             resultSet = preparedStatement.executeQuery();
 
@@ -73,7 +86,10 @@ public class PostgresCategoryRepository extends PostgresAbstractRepository imple
         try {
             connection = this.newConnection();
             preparedStatement = connection.prepareStatement(
-                "SELECT * FROM categories ORDER BY category_id LIMIT ? OFFSET ?"
+                SELECT_WITH_COUNT +
+                "GROUP BY c.category_id, c.name, c.description " +
+                "ORDER BY c.category_id " +
+                "LIMIT ? OFFSET ?"
             );
             preparedStatement.setInt(1, pageSize);
             preparedStatement.setInt(2, (page - 1) * pageSize);
@@ -103,7 +119,11 @@ public class PostgresCategoryRepository extends PostgresAbstractRepository imple
         try {
             connection = this.newConnection();
             statement = connection.createStatement();
-            resultSet = statement.executeQuery("SELECT * FROM categories ORDER BY name");
+            resultSet = statement.executeQuery(
+                SELECT_WITH_COUNT +
+                "GROUP BY c.category_id, c.name, c.description " +
+                "ORDER BY COUNT(n.news_id) DESC, c.name ASC"
+            );
 
             while (resultSet.next()) {
                 categories.add(mapRow(resultSet));
@@ -192,6 +212,7 @@ public class PostgresCategoryRepository extends PostgresAbstractRepository imple
             if (resultSet.next()) {
                 category.setId(resultSet.getLong(1));
             }
+            category.setNewsCount(0);
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
@@ -223,7 +244,7 @@ public class PostgresCategoryRepository extends PostgresAbstractRepository imple
             this.closeConnection(connection);
         }
 
-        return category;
+        return findById(category.getId());
     }
 
     @Override
@@ -243,45 +264,12 @@ public class PostgresCategoryRepository extends PostgresAbstractRepository imple
         }
     }
 
-    @Override
-    public List<Category> findAllWithCounts() {
-        List<Category> categories = new ArrayList<>();
-
-        Connection connection = null;
-        Statement statement = null;
-        ResultSet resultSet = null;
-        try {
-            connection = this.newConnection();
-            statement = connection.createStatement();
-
-            resultSet = statement.executeQuery(
-                "SELECT c.category_id, c.name, c.description, COUNT(n.news_id) AS news_count " +
-                "FROM categories c " +
-                "LEFT JOIN news n ON n.category_id = c.category_id " +
-                "GROUP BY c.category_id, c.name, c.description " +
-                "ORDER BY COUNT(n.news_id) DESC, c.name ASC"
-            );
-            while (resultSet.next()) {
-                Category category = mapRow(resultSet);
-                category.setNewsCount(resultSet.getInt("news_count"));
-                categories.add(category);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            this.closeResultSet(resultSet);
-            this.closeStatement(statement);
-            this.closeConnection(connection);
-        }
-
-        return categories;
-    }
-
     private Category mapRow(ResultSet resultSet) throws SQLException {
         Category category = new Category();
         category.setId(resultSet.getLong("category_id"));
         category.setName(resultSet.getString("name"));
         category.setDescription(resultSet.getString("description"));
+        category.setNewsCount(resultSet.getInt("news_count"));
         return category;
     }
 }

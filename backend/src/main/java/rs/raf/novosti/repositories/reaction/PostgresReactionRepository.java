@@ -9,8 +9,6 @@ import java.util.Map;
 
 public class PostgresReactionRepository extends PostgresAbstractRepository implements ReactionRepository {
 
-    // ==================== News reactions ====================
-
     @Override
     public void addOrUpdateNewsReaction(Long newsId, String sessionId, ReactionType type) {
         Connection connection = null;
@@ -67,8 +65,6 @@ public class PostgresReactionRepository extends PostgresAbstractRepository imple
         return countReactions("news_reactions", "news_id", newsId);
     }
 
-    // ==================== Comment reactions ====================
-
     @Override
     public void addOrUpdateCommentReaction(Long commentId, String sessionId, ReactionType type) {
         Connection connection = null;
@@ -124,8 +120,6 @@ public class PostgresReactionRepository extends PostgresAbstractRepository imple
     public Map<String, Integer> countCommentReactions(Long commentId) {
         return countReactions("comment_reactions", "comment_id", commentId);
     }
-
-    // ==================== Pomocni metod ====================
 
     private Map<String, Integer> countReactions(String table, String column, Long id) {
         Map<String, Integer> counts = new HashMap<>();

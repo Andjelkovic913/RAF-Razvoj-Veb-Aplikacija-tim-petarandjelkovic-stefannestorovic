@@ -19,10 +19,6 @@ public class CategoryService {
         return this.categoryRepository.findAll();
     }
 
-    public List<Category> allCategoriesWithCounts() {
-        return this.categoryRepository.findAllWithCounts();
-    }
-
     public int categoryCount() {
         return this.categoryRepository.count();
     }
