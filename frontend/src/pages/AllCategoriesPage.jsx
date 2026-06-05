@@ -1,17 +1,24 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Container, Row, Col, Card, Spinner, Alert, Badge } from 'react-bootstrap';
+import { Container, Row, Col, Card, Spinner, Alert, Badge, Pagination } from 'react-bootstrap';
 import _axios from '../axiosInstance';
+
+const PAGE_SIZE = 10;
 
 const AllCategoriesPage = () => {
     const [categories, setCategories] = useState([]);
+    const [totalCount, setTotalCount] = useState(0);
+    const [currentPage, setCurrentPage] = useState(1);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
 
     useEffect(() => {
-        _axios.get('/api/categories/all')
+        setLoading(true);
+        setError('');
+        _axios.get(`/api/categories?page=${currentPage}&pageSize=${PAGE_SIZE}`)
             .then((response) => {
-                setCategories(response.data || []);
+                setCategories(response.data.categories || []);
+                setTotalCount(response.data.totalCount || 0);
                 setLoading(false);
             })
             .catch((err) => {
@@ -19,7 +26,7 @@ const AllCategoriesPage = () => {
                 setError('Greska pri ucitavanju kategorija.');
                 setLoading(false);
             });
-    }, []);
+    }, [currentPage]);
 
     if (loading) {
         return (
@@ -37,11 +44,13 @@ const AllCategoriesPage = () => {
         );
     }
 
+    const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
+
     return (
         <Container className="mt-4">
             <h1 className="mb-4">Sve kategorije</h1>
             <p className="text-muted mb-4">
-                Ukupno {categories.length} kategorija. Kliknite na kategoriju da vidite njene vesti.
+                Ukupno {totalCount} kategorija. Kliknite na kategoriju da vidite njene vesti.
             </p>
 
             <Row>
@@ -68,6 +77,28 @@ const AllCategoriesPage = () => {
                     </Col>
                 ))}
             </Row>
+
+            {totalPages > 1 && (
+                <Pagination className="justify-content-center mt-3">
+                    <Pagination.Prev
+                        disabled={currentPage === 1}
+                        onClick={() => setCurrentPage(currentPage - 1)}
+                    />
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                        <Pagination.Item
+                            key={p}
+                            active={p === currentPage}
+                            onClick={() => setCurrentPage(p)}
+                        >
+                            {p}
+                        </Pagination.Item>
+                    ))}
+                    <Pagination.Next
+                        disabled={currentPage === totalPages}
+                        onClick={() => setCurrentPage(currentPage + 1)}
+                    />
+                </Pagination>
+            )}
         </Container>
     );
 };
