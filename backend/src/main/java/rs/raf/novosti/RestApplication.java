@@ -45,7 +45,6 @@ public class RestApplication extends ResourceConfig {
                 this.bindAsContract(CategoryService.class);
                 this.bindAsContract(NewsService.class);
                 this.bindAsContract(CommentService.class);
-                this.bindAsContract(ReactionService.class);
                 this.bindAsContract(VisitService.class);
             }
         };

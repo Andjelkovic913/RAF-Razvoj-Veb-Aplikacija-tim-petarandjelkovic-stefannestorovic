@@ -17,7 +17,7 @@ const LoginPage = () => {
             console.log('Login uspesan:', response.data);
             localStorage.setItem('jwt', response.data.jwt);
             navigate('/');
-            // Hard reload da NavigationBar pokupi novo stanje (admin link itd.)
+            // Hard reload da NavigationBar pokupi novo stanje (admin link npr)
             window.location.reload();
         } catch (error) {
             const msg = error.response?.data?.error || 'Greska pri prijavi';

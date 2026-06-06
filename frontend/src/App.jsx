@@ -2,7 +2,7 @@ import './style/App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { lazy, Suspense } from "react";
-import { Spinner } from "react-bootstrap";
+import {Alert, Container, Spinner} from "react-bootstrap";
 import NavigationBar from "./components/NavigationBar";
 import { isAuthenticated, isAdmin } from "./auth.js";
 
@@ -27,7 +27,14 @@ const PrivateRoute = ({ element }) => {
 };
 
 const AdminRoute = ({ element }) => {
-    if (!isAuthenticated()) return <Navigate to="/login" />;
+    if (!isAuthenticated())
+    return (
+        <Container className="mt-4">
+            <Alert variant="warning">
+                Morate biti prijavljeni da biste pristupili ovoj stranici.
+            </Alert>
+        </Container>
+    );
     if (!isAdmin()) return <Navigate to="/" />;
     return element;
 };

@@ -53,8 +53,7 @@ public class AuthFilter implements ContainerRequestFilter {
 
         if (method.equals("GET")) {
             if (path.startsWith("news") ||
-                path.startsWith("categories") ||
-                path.startsWith("reactions")) {
+                path.startsWith("categories")) {
                 return false;
             }
         }
@@ -64,9 +63,6 @@ public class AuthFilter implements ContainerRequestFilter {
                 return false;
             }
             if (path.startsWith("news/") && path.endsWith("/visit")) {
-                return false;
-            }
-            if (path.startsWith("reactions/")) {
                 return false;
             }
         }
